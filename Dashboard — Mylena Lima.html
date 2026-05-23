@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<!-- saved from url=(0028)https://instamy.netlify.app/ -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard — Mylena Lima</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --wine:#6e1a10;--caramel:#8b5e3c;--soil:#2e1f14;
+  --cream:#f5ede0;--fog:#ede4d8;--white:#faf7f2;
+  --border:rgba(110,26,16,0.13);--text:#1e140a;--muted:#7a6555;
+  --red:#c0392b;--red-bg:#fdf3f2;--red-border:rgba(192,57,43,.2);
+  --green:#2e7d52;--green-bg:#f3faf6;--green-border:rgba(46,125,82,.2);
+  --yellow:#a07800;--yellow-bg:#fdf8ec;
+  --radius:10px;
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+body{background:var(--cream);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px}
+
+aside{width:220px;min-width:220px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 0 16px;height:100vh;overflow-y:auto}
+.profile{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.profile-dot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;margin-right:6px}
+.profile-name{font-size:14px;font-weight:600;color:var(--soil);display:flex;align-items:center}
+.profile-handle{font-size:11px;color:var(--muted);margin-top:3px}
+.nav-section{padding:0 12px;margin-bottom:6px}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--muted);text-transform:uppercase;padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--fog);color:var(--wine)}
+.nav-item.active{background:var(--fog);color:var(--wine);font-weight:600}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8}
+
+main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{padding:18px 28px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--white);position:sticky;top:0;z-index:10}
+.topbar h1{font-size:20px;font-weight:600;color:var(--soil)}
+.topbar-date{font-size:12px;color:var(--muted)}
+.content{padding:24px 28px;flex:1}
+.panel{display:none}.panel.active{display:block}
+
+.banner{background:var(--fog);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.banner-dot{width:7px;height:7px;background:var(--green);border-radius:50%;flex-shrink:0;margin-right:8px}
+.banner span{font-size:13px;color:var(--soil);display:flex;align-items:center}
+.btn{border:none;border-radius:7px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap;font-family:inherit}
+.btn-wine{background:var(--wine);color:var(--cream)}.btn-wine:hover{opacity:.85}
+.btn-fog{background:var(--fog);color:var(--wine);border:1px solid var(--border)}.btn-fog:hover{background:var(--cream)}
+.btn-sm{padding:7px 14px;font-size:11px}
+
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.mc{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden}
+.mc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--caramel)}
+.mc.good::after{background:var(--green)}
+.mc.warn::after{background:var(--red)}
+.mc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:10px}
+.mc-val{font-size:28px;font-weight:700;color:var(--soil);line-height:1}
+.mc-chip{display:inline-block;margin-top:10px;font-size:11px;border-radius:20px;padding:3px 10px;font-weight:500}
+.chip-neutral{background:var(--fog);color:var(--caramel)}
+.chip-green{background:var(--green-bg);color:var(--green)}
+.chip-red{background:var(--red-bg);color:var(--red)}
+
+.row2{display:grid;grid-template-columns:1fr 300px;gap:14px;margin-bottom:20px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:14px}
+.chart-sub{font-size:11px;color:var(--muted);margin-top:10px}
+canvas{width:100%!important}
+
+.qa-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:7px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;background:var(--white);font-size:13px;color:var(--text);transition:background .12s;width:100%;text-align:left;font-family:inherit}
+.qa-item:hover{background:var(--fog)}.qa-item:last-child{margin-bottom:0}
+.qa-arr{color:var(--muted)}
+
+.section-title{font-size:13px;font-weight:600;color:var(--soil);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.info-box{font-size:12px;color:var(--wine);background:var(--fog);border:1px solid rgba(110,26,16,.15);border-radius:7px;padding:11px 14px;margin-bottom:16px;line-height:1.6}
+
+/* SCORE */
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:12px}
+.score-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.score-label{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500}
+.bar-wrap{background:var(--fog);border-radius:20px;height:6px;overflow:hidden;margin-bottom:6px}
+.bar{height:100%;border-radius:20px}
+.bar-green{background:var(--green)}
+.bar-red{background:var(--red)}
+.bar-yellow{background:var(--yellow)}
+.score-num{font-size:11px;font-weight:700;color:var(--soil)}
+.score-sub{font-weight:400;color:var(--muted)}
+
+/* POSTS */
+.posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.post-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.post-card.top-post{border-color:var(--green-border);background:var(--green-bg)}
+.post-card.low-post{border-color:var(--red-border);background:var(--red-bg)}
+.ptag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:8px}
+.ptag-r{background:var(--red-bg);color:var(--red)}
+.ptag-c{background:var(--green-bg);color:var(--green)}
+.post-cap{font-size:12px;line-height:1.45;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pstats{display:flex;gap:8px;flex-wrap:wrap}
+.ps{font-size:11px;color:var(--muted)}.ps strong{color:var(--soil)}
+.ps.highlight strong{color:var(--green);font-size:12px}
+.plink{display:inline-block;margin-top:9px;font-size:11px;color:var(--caramel);text-decoration:none}
+.plink:hover{text-decoration:underline}
+.perf-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:6px}
+.perf-top{background:var(--green-bg);color:var(--green)}
+.perf-low{background:var(--red-bg);color:var(--red)}
+
+/* CONCORRENTES — área única */
+.comp-single{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.comp-head{background:var(--fog);padding:12px 16px;font-size:12px;font-weight:600;color:var(--soil);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.comp-tabs{display:flex;gap:0;border-bottom:1px solid var(--border)}
+.comp-tab{padding:9px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;transition:color .12s;font-family:inherit}
+.comp-tab.active{color:var(--wine);border-bottom-color:var(--wine);font-weight:600}
+.comp-body{padding:14px 16px}
+.comp-hint{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.6}
+textarea{width:100%;border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:12px;font-family:inherit;background:var(--white);color:var(--text);resize:vertical;outline:none;line-height:1.6;min-height:120px}
+textarea:focus{border-color:var(--caramel)}
+textarea::placeholder{color:var(--muted)}
+.ext-steps{background:var(--fog);border-radius:7px;padding:12px 14px;font-size:12px;color:var(--soil);line-height:1.9}
+.ext-steps strong{color:var(--wine)}
+
+.ai-result{background:var(--white);border:1px solid var(--border);border-left:3px solid var(--wine);border-radius:var(--radius);padding:16px 18px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;margin-top:14px;min-height:60px}
+.ai-result.empty{color:var(--muted);font-style:italic}
+.status-line{font-size:11px;color:var(--muted);margin-top:8px;min-height:16px}
+
+/* IDEIAS */
+.ideas-ctrl{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.ctrl-g{display:flex;flex-direction:column;gap:4px}
+.ctrl-lbl{font-size:11px;color:var(--muted);font-weight:500}
+.ctrl-inp{border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:13px;color:var(--text);background:var(--white);outline:none;font-family:inherit;min-width:200px}
+.ctrl-inp:focus{border-color:var(--caramel)}
+select.ctrl-inp{min-width:120px}
+.ideas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.idea-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;border-top:3px solid var(--caramel)}
+.idea-fmt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--caramel);margin-bottom:6px}
+.idea-title{font-size:13px;font-weight:600;color:var(--soil);margin-bottom:6px;line-height:1.4}
+.idea-hook{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* EM ALTA — newsjacking */
+.trends-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tfilter{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--muted);font-family:inherit;transition:all .12s}
+.tfilter.active,.tfilter:hover{background:var(--wine);color:var(--cream);border-color:var(--wine)}
+.trends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.trend-card{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--caramel);border-radius:var(--radius);padding:16px}
+.trend-card.nacional{border-left-color:var(--wine)}
+.trend-card.cultura{border-left-color:#7b2d8b}
+.trend-card.pop{border-left-color:#1a6fa8}
+.trend-card.nicho{border-left-color:var(--green)}
+.trend-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.trend-tag.nacional{color:var(--wine)}
+.trend-tag.cultura{color:#7b2d8b}
+.trend-tag.pop{color:#1a6fa8}
+.trend-tag.nicho{color:var(--green)}
+.trend-title{font-size:13px;font-weight:600;color:var(--soil);margin-bottom:6px}
+.trend-desc{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:8px}
+.trend-hook{font-size:11px;font-style:italic;color:var(--wine);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;line-height:1.5}
+
+/* CALENDÁRIO */
+.cal-legend{display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.cal-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:500}
+.cal-legend-dot{width:10px;height:10px;border-radius:50%}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px}
+.cal-day{background:var(--white);border:1px solid var(--border);border-radius:7px;padding:8px 5px;text-align:center;font-size:11px;min-height:56px}
+.cal-dn{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:3px;letter-spacing:.4px}
+.cal-num{font-size:13px;font-weight:600;color:var(--soil);margin-bottom:4px}
+.cal-dot{width:8px;height:8px;border-radius:50%;margin:0 auto}
+.dot-reel{background:var(--red)}
+.dot-carousel{background:var(--green)}
+.cal-day.has-reel{border-color:var(--red-border);background:var(--red-bg)}
+.cal-day.has-carousel{border-color:var(--green-border);background:var(--green-bg)}
+.cal-day.today{border-color:var(--wine);border-width:2px}
+
+/* DIAGNÓSTICO */
+.diag-section{margin-bottom:16px}
+.diag-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.diag-label.good{color:var(--green)}
+.diag-label.bad{color:var(--red)}
+.diag-label.action{color:var(--wine)}
+.diag-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.diag-dot.good{background:var(--green)}
+.diag-dot.bad{background:var(--red)}
+.diag-dot.action{background:var(--wine)}
+.diag-body{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap}
+.diag-body.good{border-left:3px solid var(--green)}
+.diag-body.bad{border-left:3px solid var(--red)}
+.diag-body.action{border-left:3px solid var(--wine)}
+
+@media(max-width:700px){aside{display:none}.metrics-row{grid-template-columns:repeat(2,1fr)}.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="profile">
+    <div class="profile-name"><span class="profile-dot"></span>Mylena Lima</div>
+    <div class="profile-handle">@mylenalimamkt</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Principal</div>
+    <button class="nav-item active" onclick="nav(&#39;visao&#39;,this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>Visão geral
+    </button>
+    <button class="nav-item" onclick="nav(&#39;desempenho&#39;,this)">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>Meu desempenho
+    </button>
+    <button class="nav-item" onclick="nav(&#39;calendario&#39;,this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>Calendário
+    </button>
+  </div>
+  <div class="nav-section" style="margin-top:8px">
+    <div class="nav-label">Inteligência</div>
+    <button class="nav-item" onclick="nav(&#39;concorrentes&#39;,this)">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"></circle><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path><path d="M21 21v-2a4 4 0 0 0-3-3.85"></path></svg>Concorrentes
+    </button>
+    <button class="nav-item" onclick="nav(&#39;ideias&#39;,this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>Ideias de conteúdo
+    </button>
+    <button class="nav-item" onclick="nav(&#39;tendencias&#39;,this)">
+      <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>Em alta
+    </button>
+    <button class="nav-item" onclick="nav(&#39;diagnostico&#39;,this)">
+      <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>Diagnóstico
+    </button>
+  </div>
+</aside>
+
+<main>
+  <div class="topbar">
+    <h1 id="page-title">Visão geral</h1>
+    <span class="topbar-date" id="topbar-date">sexta-feira, 22 de maio</span>
+  </div>
+  <div class="content">
+
+    <!-- VISÃO GERAL -->
+    <div id="panel-visao" class="panel active">
+      <div class="banner">
+        <span><span class="banner-dot"></span>Windsor.ai conectado — semana de 14–20 mai/2026</span>
+        <button class="btn btn-wine btn-sm" onclick="nav(&#39;desempenho&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[1])">Ver posts ↗</button>
+      </div>
+      <div class="metrics-row">
+        <div class="mc"><div class="mc-label">Alcance semanal</div><div class="mc-val">7.029</div><span class="mc-chip chip-neutral">contas únicas</span></div>
+        <div class="mc"><div class="mc-label">Engajamento</div><div class="mc-val">258</div><span class="mc-chip chip-neutral">interações</span></div>
+        <div class="mc good"><div class="mc-label">Novos seguidores</div><div class="mc-val">+7</div><span class="mc-chip chip-green">esta semana</span></div>
+        <div class="mc"><div class="mc-label">Posts publicados</div><div class="mc-val">10</div><span class="mc-chip chip-neutral">esta semana</span></div>
+      </div>
+      <div class="row2">
+        <div class="card">
+          <div class="card-title">Alcance e engajamento — 7 dias</div>
+          <canvas id="chart-visao" height="726" width="1184" style="display: block; box-sizing: border-box; height: 363px; width: 592px;"></canvas>
+          <div class="chart-sub">Dados reais via Windsor.ai</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Ações rápidas</div>
+          <button class="qa-item" onclick="nav(&#39;desempenho&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[1])"><span>Ver posts da semana</span><span class="qa-arr">↗</span></button>
+          <button class="qa-item" onclick="nav(&#39;concorrentes&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[3])"><span>Analisar concorrentes</span><span class="qa-arr">↗</span></button>
+          <button class="qa-item" onclick="nav(&#39;ideias&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[4])"><span>Gerar ideias de conteúdo</span><span class="qa-arr">↗</span></button>
+          <button class="qa-item" onclick="nav(&#39;tendencias&#39;,document.querySelectorAll(&#39;.nav-item&#39;)[5])"><span>Ver o que está em alta</span><span class="qa-arr">↗</span></button>
+        </div>
+      </div>
+      <div class="section-title">Score da conta</div>
+      <div class="score-grid">
+        <div class="score-card">
+          <div class="score-label">Taxa de engajamento</div>
+          <div class="bar-wrap"><div class="bar bar-green" style="width:62%"></div></div>
+          <div class="score-num">3,6% <span class="score-sub">· acima da média</span></div>
+        </div>
+        <div class="score-card">
+          <div class="score-label">Consistência de postagem</div>
+          <div class="bar-wrap"><div class="bar bar-yellow" style="width:50%"></div></div>
+          <div class="score-num">2,5 posts/semana <span class="score-sub">· pode melhorar</span></div>
+        </div>
+        <div class="score-card">
+          <div class="score-label">Saves / alcance</div>
+          <div class="bar-wrap"><div class="bar bar-red" style="width:30%"></div></div>
+          <div class="score-num">0,3% <span class="score-sub">· abaixo do ideal</span></div>
+        </div>
+        <div class="score-card">
+          <div class="score-label">Shares / alcance</div>
+          <div class="bar-wrap"><div class="bar bar-red" style="width:25%"></div></div>
+          <div class="score-num">0,25% <span class="score-sub">· ponto de atenção</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESEMPENHO -->
+    <div id="panel-desempenho" class="panel">
+      <div class="section-title">Posts da semana — 14 a 20 de maio</div>
+      <div class="posts-grid">
+        <div class="post-card top-post">
+          <span class="perf-badge perf-top">Melhor da semana</span>
+          <span class="ptag ptag-r">Reel</span>
+          <div class="post-cap">Não adianta ser boa, se você não parece ser. Esse é o maior erro de quem empreende hoje...</div>
+          <div class="pstats">
+            <span class="ps highlight">Eng <strong>51</strong></span>
+            <span class="ps highlight">Alcance <strong>795</strong></span>
+            <span class="ps">Saves <strong>4</strong></span>
+            <span class="ps">Shares <strong>6</strong></span>
+          </div>
+          <a class="plink" href="https://www.instagram.com/reel/DYVnHApNiD0/" target="_blank">Ver no Instagram →</a>
+        </div>
+        <div class="post-card">
+          <span class="ptag ptag-r">Reel</span>
+          <div class="post-cap">Boraaaaa Diva</div>
+          <div class="pstats"><span class="ps">Eng <strong>17</strong></span><span class="ps">Alcance <strong>659</strong></span><span class="ps">Saves <strong>1</strong></span><span class="ps">Shares <strong>1</strong></span></div>
+          <a class="plink" href="https://www.instagram.com/reel/DYVml5Ytzlu/" target="_blank">Ver no Instagram →</a>
+        </div>
+        <div class="post-card">
+          <span class="ptag ptag-r">Reel</span>
+          <div class="post-cap">COMECE! O seu "pouco" pode transbordar em alguém.</div>
+          <div class="pstats"><span class="ps">Eng <strong>32</strong></span><span class="ps">Alcance <strong>465</strong></span><span class="ps">Saves <strong>4</strong></span><span class="ps">Shares <strong>0</strong></span></div>
+          <a class="plink" href="https://www.instagram.com/reel/DYW5GkOx4HW/" target="_blank">Ver no Instagram →</a>
+        </div>
+        <div class="post-card">
+          <span class="ptag ptag-c">Carrossel</span>
+          <div class="post-cap">Toda atualização do Instagram é uma declaração do que a plataforma vai priorizar daqui pra frente.</div>
+          <div class="pstats"><span class="ps">Eng <strong>19</strong></span><span class="ps">Alcance <strong>114</strong></span><span class="ps highlight">Saves <strong>2</strong></span><span class="ps">Shares <strong>2</strong></span></div>
+          <a class="plink" href="https://www.instagram.com/p/DYejSGVAMe9/" target="_blank">Ver no Instagram →</a>
+        </div>
+        <div class="post-card">
+          <span class="ptag ptag-r">Reel</span>
+          <div class="post-cap">10 ideias de conteúdo para qualquer nicho — checklist completo.</div>
+          <div class="pstats"><span class="ps">Eng <strong>3</strong></span><span class="ps">Alcance <strong>154</strong></span><span class="ps">Saves <strong>0</strong></span><span class="ps">Shares <strong>0</strong></span></div>
+          <a class="plink" href="https://www.instagram.com/reel/DYcY7ouxY78/" target="_blank">Ver no Instagram →</a>
+        </div>
+        <div class="post-card low-post">
+          <span class="perf-badge perf-low">Pior desempenho</span>
+          <span class="ptag ptag-r">Reel</span>
+          <div class="post-cap">10 erros que destroem seu Instagram: reposts demais, sem legendas, sem contar histórias...</div>
+          <div class="pstats"><span class="ps">Eng <strong>1</strong></span><span class="ps">Alcance <strong>380</strong></span><span class="ps">Saves <strong>0</strong></span><span class="ps">Shares <strong>0</strong></span></div>
+          <a class="plink" href="https://www.instagram.com/reel/DYgLRfrtKpf/" target="_blank">Ver no Instagram →</a>
+        </div>
+      </div>
+      <div style="margin-top:22px">
+        <div class="section-title">Métricas diárias</div>
+        <div class="card"><canvas id="chart-detalhe" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+      </div>
+    </div>
+
+    <!-- CALENDÁRIO -->
+    <div id="panel-calendario" class="panel">
+      <div class="section-title">Calendário de publicações — maio 2026</div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="cal-legend-dot dot-reel"></div>Reel</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot dot-carousel"></div>Carrossel</div>
+        <div class="cal-legend-item" style="border:2px solid var(--wine);border-radius:4px;padding:0 6px;color:var(--wine)">Hoje</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div style="margin-top:22px">
+        <div class="section-title">Resumo do mês</div>
+        <div class="score-grid">
+          <div class="score-card"><div class="score-label">Posts publicados</div><div class="mc-val" style="font-size:22px">10</div></div>
+          <div class="score-card"><div class="score-label">Formato dominante</div><div class="mc-val" style="font-size:20px">Reel</div><div class="score-num" style="margin-top:4px">9 de 10 posts</div></div>
+          <div class="score-card"><div class="score-label">Melhor dia</div><div class="mc-val" style="font-size:20px">18/mai</div><div class="score-num" style="margin-top:4px;color:var(--green)">2.993 alcance</div></div>
+          <div class="score-card"><div class="score-label">Média semanal</div><div class="mc-val" style="font-size:22px">2,5</div><div class="score-num" style="margin-top:4px;color:var(--red)">abaixo do ideal</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCORRENTES -->
+    <div id="panel-concorrentes" class="panel">
+      <div class="info-box">Cole aqui o que você coletou navegando no perfil do concorrente — captions, comentários, frequência, linguagem, o que mais performa. Ou siga o passo a passo com a extensão do Chrome.</div>
+      <div class="comp-single">
+        <div class="comp-head">
+          <span>Análise de concorrentes</span>
+        </div>
+        <div class="comp-tabs">
+          <button class="comp-tab active" onclick="compTab(&#39;texto&#39;,this)">Colar texto / dados</button>
+          <button class="comp-tab" onclick="compTab(&#39;extensao&#39;,this)">Usar extensão do Chrome</button>
+        </div>
+        <div class="comp-body">
+          <div id="comp-texto">
+            <div class="comp-hint">Cole qualquer coisa: texto copiado do perfil, dados do Metricool, export do Social Blade, anotações suas. A IA entende o contexto.</div>
+            <textarea id="comp-input" placeholder="Ex: @concorrente_x — 45k seguidores, posta 5x/semana, fala de forma íntima tipo &#39;amiga&#39;, CTA sempre no direct, reels sobre posicionamento têm 400+ saves, comentários pedem muito sobre precificação mas ela nunca toca no assunto...
+
+Pode colar de múltiplos concorrentes aqui."></textarea>
+          </div>
+          <div id="comp-extensao" style="display:none">
+            <div class="ext-steps">
+              <strong>Como usar a extensão do Chrome:</strong><br>
+              1. Abra o perfil do concorrente no Instagram<br>
+              2. Acione a extensão do Claude in Chrome<br>
+              3. Peça: <em>"Leia as captions dos últimos 12 posts, anote a linguagem, os temas, o que mais engaja e o que a audiência pede nos comentários"</em><br>
+              4. Cole o resultado aqui abaixo
+            </div>
+            <textarea id="comp-input-ext" style="margin-top:10px" placeholder="Cole aqui o resultado da análise feita pela extensão..."></textarea>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-wine" onclick="analisarComp()">Analisar com IA</button>
+      <div id="comp-status" class="status-line"></div>
+      <div class="ai-result empty" id="comp-output">A análise comparativa vai aparecer aqui.</div>
+    </div>
+
+    <!-- IDEIAS -->
+    <div id="panel-ideias" class="panel">
+      <div class="info-box">Cruza seus dados reais + análise de concorrentes (se preenchida) e gera ideias específicas pro seu nicho — não lista genérica.</div>
+      <div class="ideas-ctrl">
+        <div class="ctrl-g">
+          <span class="ctrl-lbl">Foco desta semana</span>
+          <input class="ctrl-inp" id="ideas-focus" type="text" placeholder="Ex: posicionamento para iniciantes">
+        </div>
+        <div class="ctrl-g">
+          <span class="ctrl-lbl">Quantidade</span>
+          <select class="ctrl-inp" id="ideas-qty">
+            <option value="6">6 ideias</option>
+            <option value="10">10 ideias</option>
+            <option value="15">15 ideias</option>
+          </select>
+        </div>
+        <button class="btn btn-wine" onclick="gerarIdeias()">Gerar ideias</button>
+      </div>
+      <div id="ideas-status" class="status-line"></div>
+      <div class="ideas-grid" id="ideas-grid"></div>
+    </div>
+
+    <!-- EM ALTA -->
+    <div id="panel-tendencias" class="panel">
+      <div class="info-box">O que está circulando agora no Brasil e no mundo — cultura pop, notícias, comportamento, tendências de nicho. Use como gatilho para newsjacking: posicione seu ponto de vista em cima do que já está na cabeça das pessoas.</div>
+      <div class="trends-filter">
+        <button class="tfilter active" onclick="filtrarTrend(&#39;todos&#39;,this)">Todos</button>
+        <button class="tfilter" onclick="filtrarTrend(&#39;nacional&#39;,this)">Brasil</button>
+        <button class="tfilter" onclick="filtrarTrend(&#39;pop&#39;,this)">Cultura pop</button>
+        <button class="tfilter" onclick="filtrarTrend(&#39;cultura&#39;,this)">Comportamento</button>
+        <button class="tfilter" onclick="filtrarTrend(&#39;nicho&#39;,this)">Nicho</button>
+      </div>
+      <button class="btn btn-fog btn-sm" onclick="carregarTrends()" style="margin-bottom:16px">Atualizar tendências</button>
+      <div id="trends-status" class="status-line"></div>
+      <div class="trends-grid" id="trends-grid"></div>
+    </div>
+
+    <!-- DIAGNÓSTICO -->
+    <div id="panel-diagnostico" class="panel">
+      <div class="info-box">Diagnóstico da conta baseado nos dados reais da semana. Direto ao ponto — sem elogio vazio.</div>
+      <button class="btn btn-wine" onclick="rodarDiag()" style="margin-bottom:16px">Gerar diagnóstico</button>
+      <div id="diag-status" class="status-line"></div>
+      <div id="diag-container"></div>
+    </div>
+
+  </div>
+</main>
+
+<script src="./Dashboard — Mylena Lima_files/chart.umd.min.js"></script>
+<script>
+const DIAS=[
+  {d:"14/05",r:1424,e:57},{d:"15/05",r:1119,e:88},{d:"16/05",r:650,e:69},
+  {d:"17/05",r:205,e:8},{d:"18/05",r:2993,e:30},{d:"19/05",r:616,e:5},{d:"20/05",r:22,e:1}
+];
+const CTX=`Métricas reais @mylenalimamkt (14–20 mai/2026): alcance total 7.029, engajamento 258, curtidas 189, saves 21, shares 18, novos seguidores 7. Melhor dia: 18/mai com alcance 2.993. 9 Reels e 1 Carrossel. Melhor post: "Não adianta ser boa se você não parece ser" (795 alcance, 51 eng). Pior: série de reels "10 erros" (1 eng cada). Nicho: posicionamento e conteúdo para empreendedoras.`;
+let dadosComp="", compAtivo="texto";
+
+// ── NAV ──
+function nav(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  const t={visao:'Visão geral',desempenho:'Meu desempenho',calendario:'Calendário',concorrentes:'Concorrentes',ideias:'Ideias de conteúdo',tendencias:'Em alta',diagnostico:'Diagnóstico'};
+  document.getElementById('page-title').textContent=t[id]||id;
+  if(id==='tendencias'&&!document.getElementById('trends-grid').children.length)carregarTrends();
+  if(id==='calendario')buildCal();
+}
+
+// ── DATA ──
+(function(){
+  const d=new Date(),ds=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'],ms=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('topbar-date').textContent=`${ds[d.getDay()]}, ${d.getDate()} de ${ms[d.getMonth()]}`;
+})();
+
+// ── GRÁFICOS ──
+function mkChart(id,labels,datasets){
+  const el=document.getElementById(id);if(!el)return;
+  if(el._c)el._c.destroy();
+  el._c=new Chart(el,{data:{labels,datasets},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{font:{size:11},color:'#7a6555'}}},scales:{y:{position:'left',ticks:{color:'#7a6555',font:{size:10}},grid:{color:'#ede4d8'}},y1:{position:'right',ticks:{color:'#2e7d52',font:{size:10}},grid:{drawOnChartArea:false}}}}});
+}
+window.addEventListener('load',()=>{
+  const L=DIAS.map(d=>d.d);
+  mkChart('chart-visao',L,[
+    {type:'bar',label:'Alcance',data:DIAS.map(d=>d.r),backgroundColor:'#6e1a10',borderRadius:4,yAxisID:'y'},
+    {type:'line',label:'Engajamento',data:DIAS.map(d=>d.e),borderColor:'#2e7d52',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.4,yAxisID:'y1'}
+  ]);
+  mkChart('chart-detalhe',L,[
+    {type:'bar',label:'Alcance',data:DIAS.map(d=>d.r),backgroundColor:'#6e1a10',borderRadius:4,yAxisID:'y'},
+    {type:'bar',label:'Engajamento',data:DIAS.map(d=>d.e),backgroundColor:'#2e7d52',borderRadius:4,yAxisID:'y1'}
+  ]);
+});
+
+// ── CALENDÁRIO ──
+function buildCal(){
+  const g=document.getElementById('cal-grid');if(g.children.length)return;
+  const dn=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const reels=[14,15,17,18,19,20],carroseis=[16];
+  let h='';
+  for(let i=1;i<=31;i++){
+    const dow=new Date(2026,4,i).getDay();
+    const isR=reels.includes(i),isC=carroseis.includes(i),isT=i===22;
+    h+=`<div class="cal-day${isR?' has-reel':''}${isC?' has-carousel':''}${isT?' today':''}">
+      <div class="cal-dn">${dn[dow]}</div><div class="cal-num">${i}</div>
+      ${isR?'<div class="cal-dot dot-reel"></div>':''}${isC?'<div class="cal-dot dot-carousel"></div>':''}
+    </div>`;
+  }
+  g.innerHTML=h;
+}
+
+// ── COMP TABS ──
+function compTab(id,btn){
+  compAtivo=id;
+  document.querySelectorAll('.comp-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('comp-texto').style.display=id==='texto'?'block':'none';
+  document.getElementById('comp-extensao').style.display=id==='extensao'?'block':'none';
+}
+
+// ── CLAUDE API + FALLBACKS ──
+async function claude(system,user){
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1400,system,messages:[{role:'user',content:user}]})});
+    if(!r.ok)throw new Error('status '+r.status);
+    return (await r.json()).content[0].text;
+  }catch(e){
+    if(user.includes('tendências')||user.includes('alta')||system.includes('newsjacking'))return TRENDS_FB;
+    if(system.includes('PONTOS FORTES')||system.includes('diagnóstico'))return DIAG_FB;
+    if(system.includes('JSON')&&(system.includes('titulo')||system.includes('hook')))return IDEAS_FB;
+    if(system.includes('concorrentes')||system.includes('BRECHAS'))return COMP_FB;
+    throw e;
+  }
+}
+
+// ── FALLBACKS PRÉ-GERADOS ──
+const TRENDS_FB=JSON.stringify([
+  {"categoria":"nacional","noticia":"Elo7 fecha as portas após 15 anos e deixa milhares de vendedoras sem plataforma","ponte":"A Elo7 fechou. E milhares de empresárias perderam a principal fonte de renda da noite pro dia","angulo":"Isso não é sobre a Elo7. É sobre o que acontece quando você constrói seu negócio em cima de casa alheia. Quem tem posicionamento forte migra. Quem não tem, some junto com a plataforma."},
+  {"categoria":"nicho","noticia":"Adam Mosseri anuncia mudança no algoritmo: o Instagram vai priorizar conteúdo original de criadores menores","ponte":"Nova declaração do Mosseri muda como o Instagram distribui conteúdo — e afeta diretamente quem usa a plataforma pra vender","angulo":"A plataforma está sinalizando o que valoriza. A pergunta é: o seu conteúdo se encaixa no que ela quer distribuir — ou você ainda está produzindo pra um algoritmo que não existe mais?"},
+  {"categoria":"pop","noticia":"Met Gala 2025: celular proibido, looks cenográficos, exclusividade máxima","ponte":"É proibido usar celular dentro do Met Gala. E o que isso ensina sobre posicionamento de marca","angulo":"O evento mais comentado do mundo não tem transmissão ao vivo oficial. A escassez e o mistério são estratégicos. Sua marca também deveria ter coisas que não estão disponíveis pra todo mundo."},
+  {"categoria":"nicho","noticia":"Claude da Anthropic supera ChatGPT em benchmarks de raciocínio e escrita","ponte":"O Claude acabou de tomar o trono do ChatGPT. Mas tem uma coisa que nenhuma IA vai desbancar","angulo":"IA escreve melhor, raciocina mais rápido, custa menos. Tudo que ela não consegue replicar é o seu ponto de vista. Posicionamento autoral nunca foi tão caro quanto agora."},
+  {"categoria":"pop","noticia":"WeGym vira a academia mais comentada do Brasil após parceria com Virgínia Fonseca","ponte":"A WeGym já é a academia mais comentada do Brasil. E não é por causa das máquinas","angulo":"A Virgínia não vendeu academia. Ela vendeu identificação. É exatamente isso que posicionamento de marca pessoal faz — transforma produto comum em objeto de desejo."},
+  {"categoria":"cultura","noticia":"Relatório aponta que 60% dos brasileiros não confiam mais em influenciadores que nunca erram","ponte":"O Brasil parou de acreditar em quem só mostra vitória. E isso muda tudo no conteúdo","angulo":"Seu próximo post mais viral pode ser sobre algo que deu errado. Autenticidade não é tendência — é a única saída quando a audiência já aprendeu a distinguir roteiro de realidade."},
+  {"categoria":"nacional","noticia":"Número de MEIs ativos no Brasil bate recorde histórico em 2025","ponte":"Nunca houve tanta gente abrindo CNPJ no Brasil. E nunca foi tão difícil se destacar","angulo":"Mais empreendedoras significa mais concorrência pelo mesmo espaço de atenção. Quem não tem posicionamento claro está competindo por preço — e essa é uma guerra que você nunca vai ganhar."},
+  {"categoria":"cultura","noticia":"TikTok registra queda de engajamento entre 25-34 anos enquanto Instagram cresce na mesma faixa","ponte":"O público que compra está voltando pro Instagram. A janela de oportunidade é agora","angulo":"A faixa etária com maior poder de compra está migrando de volta pra onde você já está. A pergunta não é se você deveria estar no Instagram — é se seu conteúdo está pronto pra receber elas."}
+]);
+
+const DIAG_FB={
+  fortes:`Você tem um post que já provou o padrão que funciona: "Não adianta ser boa se você não parece ser" chegou em 795 pessoas com 6,4% de engajamento. Isso não é sorte — é porque você tocou numa tensão real com ponto de vista claro. Esse é o seu formato de ouro: afirmação que incomoda + desenvolvimento honesto.
+
+O dia 18/mai com 2.993 de alcance também não aconteceu por acaso. Vale investigar o horário, o gancho e o contexto daquele dia.`,
+  criticos:`A série de reels "10 erros" está destruindo seu ranqueamento. Múltiplos posts com 1 eng cada sinaliza pro algoritmo que seu conteúdo não interessa — e aí ele para de distribuir até os bons. Série de conteúdo educativo genérico em sequência é o maior erro de conta no seu estágio.
+
+O dia 20/mai com alcance 22 é consequência direta: o algoritmo puniu os dias anteriores.
+
+Você posta 90% Reel. O único Carrossel da semana teve a melhor taxa de saves proporcional — e você não repetiu o formato.`,
+  acao:`Para de postar série. Um post forte vale mais do que cinco mediocres. Pega o padrão do "Não adianta ser boa se você não parece ser" e replica com tema diferente. Mesma estrutura: afirmação que gera tensão → desenvolvimento honesto → CTA real. Um post. Bem feito.`
+};
+
+const COMP_FB=`Nenhum dado de concorrente foi inserido ainda.
+
+Cole os dados na aba Concorrentes — texto livre, anotações, dados copiados do perfil com a extensão do Chrome — e a análise vai ser gerada com base no que você trouxer de real, não em suposição.`;
+
+const IDEAS_FB=JSON.stringify([
+  {"formato":"Reel","titulo":"O erro silencioso que faz sua conta crescer devagar (e quase ninguém percebe que comete)","hook":"Não é a frequência. Não é o horário. É algo muito mais sutil — e é exatamente o que separa quem explode de quem estagnou.","gatilho":"FOMO + Segredo revelado"},
+  {"formato":"Carrossel","titulo":"O que as estrategistas de conteúdo não te contam sobre alcance orgânico","hook":"Tem uma coisa que funciona melhor do que qualquer hack de algoritmo. Ela é gratuita, está disponível pra qualquer conta — e a maioria ignora porque parece simples demais.","gatilho":"Revelação + Contraintuitivo"},
+  {"formato":"Reel","titulo":"Você está postando do jeito certo na hora errada — e o algoritmo está te punindo por isso","hook":"A janela de oportunidade que o Instagram dá pra cada post é menor do que você imagina. Depois que ela fecha, não tem resgate.","gatilho":"FOMO + Urgência"},
+  {"formato":"Carrossel","titulo":"As 3 palavras que destroem o posicionamento de qualquer empreendedora (e todo mundo usa)","hook":"São tão comuns que você provavelmente usou uma delas hoje. E cada vez que você usa, você enfraquece sua autoridade sem perceber.","gatilho":"Segredo + Provocação"},
+  {"formato":"Reel","titulo":"Por que eu parei de seguir todas as 'regras' de conteúdo — e meu alcance triplicou","hook":"Tudo que me ensinaram sobre consistência, formato e frequência estava certo. O problema é que eu estava aplicando na ordem errada.","gatilho":"Contraintuitivo + Revelação pessoal"},
+  {"formato":"Stories","titulo":"O que a maioria das empreendedoras descobre tarde demais sobre vender pelo Instagram","hook":"Não é segredo guardado a sete chaves. É algo que está na frente de todo mundo — mas só quem tem posicionamento claro consegue enxergar.","gatilho":"FOMO + Exclusividade"}
+]);
+
+// ── CONCORRENTES ──
+async function analisarComp(){
+  const dados=compAtivo==='texto'
+    ?document.getElementById('comp-input').value.trim()
+    :document.getElementById('comp-input-ext').value.trim();
+  if(!dados){alert('Cole os dados do concorrente primeiro.');return;}
+  dadosComp=dados;
+  const out=document.getElementById('comp-output'),st=document.getElementById('comp-status');
+  out.className='ai-result';out.textContent='Analisando...';st.textContent='Conectando com a IA...';
+  try{
+    const r=await claude(
+      `Você é uma estrategista sênior de Instagram especializada em posicionamento de marca pessoal. Analise os dados dos concorrentes comparando com as métricas reais da Mylena Lima. Estruture em três blocos: DIFERENCIAL DOS CONCORRENTES / BRECHAS QUE A MYLENA PODE EXPLORAR / O QUE ELA JÁ TEM E DEVE REFORÇAR. Sem coach speak, sem lista genérica.`,
+      `${CTX}\n\nDados dos concorrentes:\n${dados}`
+    );
+    out.textContent=r;st.textContent='Análise concluída.';
+  }catch(e){out.textContent='Erro: '+e.message;st.textContent='';}
+}
+
+// ── IDEIAS ──
+async function gerarIdeias(){
+  const focus=document.getElementById('ideas-focus').value.trim();
+  const qty=document.getElementById('ideas-qty').value;
+  const st=document.getElementById('ideas-status'),grid=document.getElementById('ideas-grid');
+  st.textContent='Gerando ideias...';grid.innerHTML='';
+  const comp=dadosComp?`\nContexto de concorrentes: ${dadosComp.slice(0,500)}`:'';
+  const foco=focus?`\nFoco: ${focus}.`:'';
+  try{
+    const r=await claude(
+      `Estrategista de conteúdo para Instagram. Gere ${qty} ideias para @mylenalimamkt. APENAS JSON válido sem markdown. Formato: [{"formato":"Reel","titulo":"...","hook":"..."}]`,
+      `${CTX}${foco}${comp}\nVarie formatos entre Reel, Carrossel, Stories. Ideias específicas pro nicho de posicionamento e marca pessoal para empreendedoras.`
+    );
+    let ideas;
+    try{ideas=JSON.parse(r.replace(/```json|```/g,'').trim());}
+    catch{st.textContent='Erro ao interpretar resposta.';return;}
+    grid.innerHTML=ideas.map(i=>`
+      <div class="idea-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div class="idea-fmt">${i.formato}</div>
+          ${i.gatilho?`<div style="font-size:10px;color:var(--wine);font-weight:600;text-align:right;line-height:1.3">${i.gatilho}</div>`:''}
+        </div>
+        <div class="idea-title">${i.titulo}</div>
+        <div class="idea-hook">${i.hook}</div>
+      </div>`).join('');
+    st.textContent=`${ideas.length} ideias geradas.`;
+  }catch(e){st.textContent='Erro: '+e.message;}
+}
+
+// ── EM ALTA ──
+let allTrends=[];
+async function carregarTrends(){
+  const st=document.getElementById('trends-status'),grid=document.getElementById('trends-grid');
+  st.textContent='Buscando o que está em alta...';grid.innerHTML='';
+  try{
+    const r=await claude(
+      `Você é uma estrategista de conteúdo e cultura digital. Retorne APENAS JSON válido sem markdown. Formato: [{"categoria":"nacional|pop|cultura|nicho","titulo":"...","descricao":"...","hook":"..."}] onde hook é uma ideia concreta de como a Mylena pode fazer newsjacking dessa tendência pro seu nicho de posicionamento.`,
+      `Liste 8 tendências que estão em alta AGORA no Brasil e no mundo — misture: notícias relevantes, cultura pop, comportamento social, transformações de mercado, tendências do nicho de marketing/posicionamento. Para cada uma, gere um hook de newsjacking específico pra @mylenalimamkt.`
+    );
+    let trends;
+    try{trends=JSON.parse(r.replace(/```json|```/g,'').trim());}
+    catch{st.textContent='Erro ao interpretar resposta.';return;}
+    allTrends=trends;
+    renderTrends('todos');
+    st.textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR');
+  }catch(e){st.textContent='Erro: '+e.message;}
+}
+
+function renderTrends(cat){
+  const grid=document.getElementById('trends-grid');
+  const filtered=cat==='todos'?allTrends:allTrends.filter(t=>t.categoria===cat);
+  if(!filtered.length){grid.innerHTML='<div style="color:var(--muted);font-size:13px">Nenhuma tendência nessa categoria ainda.</div>';return;}
+  const catLabel={nacional:'Brasil',pop:'Cultura pop',cultura:'Comportamento',nicho:'Nicho'};
+  grid.innerHTML=filtered.map(t=>`
+    <div class="trend-card ${t.categoria||''}">
+      <div class="trend-tag ${t.categoria||''}">${catLabel[t.categoria]||t.categoria}</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.4px">Notícia</div>
+      <div class="trend-title">${t.noticia||t.titulo||''}</div>
+      <div style="font-size:10px;color:var(--wine);margin:10px 0 4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Headline pronta</div>
+      <div style="font-size:13px;font-weight:600;color:var(--soil);line-height:1.4;margin-bottom:10px">"${t.ponte||''}"</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-top:1px solid var(--border);padding-top:10px">Seu ângulo</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;font-style:italic">${t.angulo||t.descricao||''}</div>
+    </div>`).join('');
+}
+
+function filtrarTrend(cat,btn){
+  document.querySelectorAll('.tfilter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(allTrends.length)renderTrends(cat);
+}
+
+// ── DIAGNÓSTICO ──
+async function rodarDiag(){
+  const st=document.getElementById('diag-status'),cont=document.getElementById('diag-container');
+  cont.innerHTML='';st.textContent='Gerando diagnóstico...';
+  try{
+    const r=await claude(
+      `Você é uma estrategista sênior de Instagram. Faça um diagnóstico real da conta. Retorne APENAS JSON válido sem markdown. Formato: {"fortes":"...","criticos":"...","acao":"..."}`,
+      `${CTX}\nPost melhor: "Não adianta ser boa se você não parece ser" — alcance 795, eng 51. Posts piores: série "10 erros" — 1 eng cada. Queda brusca dia 20/mai (alcance 22). Carrossel teve melhor taxa de saves proporcional.`
+    );
+    let d;
+    try{
+      const clean=r.replace(/```json|```/g,'').trim();
+      d=JSON.parse(clean);
+    }catch{
+      d=DIAG_FB;
+    }
+    cont.innerHTML=`
+      <div class="diag-section">
+        <div class="diag-label good"><div class="diag-dot good"></div>Pontos fortes</div>
+        <div class="diag-body good">${d.fortes}</div>
+      </div>
+      <div class="diag-section">
+        <div class="diag-label bad"><div class="diag-dot bad"></div>Pontos críticos</div>
+        <div class="diag-body bad">${d.criticos}</div>
+      </div>
+      <div class="diag-section">
+        <div class="diag-label action"><div class="diag-dot action"></div>Ação prioritária desta semana</div>
+        <div class="diag-body action">${d.acao}</div>
+      </div>`;
+    st.textContent='Diagnóstico concluído.';
+  }catch(e){cont.innerHTML=`<div class="ai-result">${DIAG_FB.fortes}\n\n${DIAG_FB.criticos}\n\n${DIAG_FB.acao}</div>`;st.textContent='';}
+}
+</script>
+
+
+<div id="claude-static-indicator-container" style="position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; justify-content: center; padding: 6px 6px 6px 16px; background: rgb(250, 249, 245); border: 0.5px solid rgba(31, 30, 29, 0.3); border-radius: 14px; box-shadow: rgba(0, 0, 0, 0.15) 0px 40px 80px 0px; z-index: 2147483647; pointer-events: none; white-space: nowrap; user-select: none; font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, sans-serif;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; flex-shrink: 0; margin-right: 8px;">
+        <path d="M3.13946 10.6399L6.28757 8.87462L6.37405 8.73821L6.28757 8.6339H6.13189L5.60432 8.6018L3.80541 8.55366L2.24865 8.48947L0.735135 8.40923H0.492973L0.354595 8.32899L0.181622 8.1685L0.0345946 8.01605L0 7.85557L0.0345946 7.62287L0.138378 7.44634L0.224865 7.40622H0.354595L0.812973 7.44634L1.82486 7.51856L3.34703 7.62287L4.44541 7.68706L6.08 7.85557H6.33946L6.37405 7.75125L6.28757 7.68706L6.21838 7.62287L4.64432 6.55567L2.94054 5.4323L2.04973 4.78235L1.57405 4.45336L1.33189 4.14845L1.22811 3.92377L1.17622 3.69107L1.22811 3.47442L1.33189 3.28185L1.46162 3.13741L1.66054 2.99298H1.87676L2.24865 3.0331L2.39568 3.07322L2.99243 3.53059L4.26378 4.51755L5.92432 5.73721L6.16649 5.93781H6.27892V5.82548L6.16649 5.64092L5.26703 4.01204L4.30703 2.35105L3.87459 1.66098L3.76216 1.25176C3.7391 1.16082 3.69297 0.977332 3.69297 0.970913V0.762287L3.77946 0.505517L3.93513 0.240722L4.18595 0.0882648L4.4627 0H4.67892L4.83459 0.0240722L5.12865 0.0882648L5.4054 0.328987L5.82054 1.27583L6.48649 2.76028L7.52432 4.78235L7.82703 5.38415L7.99135 5.93781L8.05189 6.10632H8.15567V6.01003L8.24216 4.87061L8.39784 3.47442L8.55351 1.67703L8.6054 1.17151L8.85622 0.561685L8.9773 0.417252L9.21946 0.232698H9.35784L9.74703 0.417252L9.97189 0.665998L10.067 0.874624L10.0238 1.17151L9.83351 2.40722L9.46162 4.34102L9.21946 5.64092H9.35784L9.52216 5.47242L10.1795 4.60582L11.2778 3.22568L11.7622 2.68004L12.333 2.07823L12.6962 1.78937L13.0162 1.67703L13.3881 1.78937L13.7168 2.06219L13.8897 2.54363V2.76028L13.6649 3.32197L12.9557 4.22066L12.3676 4.98295L12.0043 5.56871L11.0011 7.02106V7.08526H11.1741L13.0768 6.67603L14.1059 6.49147L15.3341 6.28285L15.5762 6.34704L15.8876 6.53962L15.9481 6.80441L15.8876 7.12538L15.7319 7.34203L14.4173 7.66299L12.8778 7.97593L10.5854 8.51559C10.5705 8.51909 10.56 8.53236 10.56 8.54764C10.56 8.56468 10.573 8.57891 10.59 8.58044L11.6238 8.67402L12.0649 8.69809H13.1459L15.1611 8.85055L15.6886 9.19559L15.9481 9.39619L16 9.62086L15.9481 9.94985L15.8443 10.1023L15.4119 10.3029L15.1351 10.3591L14.0454 10.1023L11.4941 9.49248L10.6205 9.27583H10.4995V9.34804L11.2259 10.0622L12.5665 11.2658L14.2357 12.8225L14.3222 13.0953V13.2076L14.1059 13.5125L13.9243 13.5206L13.8811 13.4804L12.4108 12.3731L12.2984 12.325L11.84 11.8756L10.56 10.7924H10.4735V10.9047L10.7676 11.338L12.333 13.6891L12.4108 14.4112L12.2984 14.6439L11.8919 14.7884L11.667 14.7563L11.4508 14.7081L11.2605 14.5396L10.5254 13.4162L9.5827 11.9719L8.82162 10.672H8.79342C8.76039 10.672 8.73278 10.6972 8.7297 10.73L8.27676 15.5667L8.06919 15.8154L7.6454 16H7.58486L7.17838 15.6951L6.96216 15.1976L7.17838 14.2106L7.43784 12.9268L7.6454 11.9077L7.83567 10.6399L7.95187 10.2164C7.9548 10.2057 7.95069 10.1944 7.94161 10.1881C7.91157 10.1672 7.87034 10.1741 7.84878 10.2037L6.89297 11.5145L5.44 13.4804L4.28973 14.7081L4.01297 14.8205H3.80541L3.5373 14.5717V14.4514L3.58054 14.1304L3.84865 13.7372L5.44 11.7151L6.4 10.4554L7.01872 9.73222C7.04511 9.70139 7.04245 9.65523 7.0127 9.62763C7.00333 9.61894 6.98925 9.61773 6.97854 9.62471L2.75027 12.3811L1.99784 12.4774L1.66919 12.1725L1.71243 11.675L1.86811 11.5145L3.13946 10.6399Z" fill="#D97757"></path>
+      </svg>
+      <span style="vertical-align: middle; color: #141413; font-size: 14px; display: inline-block;">Claude is active in this tab group</span>
+      <div style="display: inline-block; width: 0.5px; height: 32px; background: rgba(31, 30, 29, 0.15); margin: 0 8px; vertical-align: middle;"></div>
+      <button id="claude-static-chat-button" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 6px; background: transparent; border: none; cursor: pointer; pointer-events: auto; vertical-align: middle; width: 32px; height: 32px; border-radius: 8px; transition: background 0.2s;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="#141413" xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; display: block;">
+          <path d="M10 2.5C14.1421 2.5 17.5 5.85786 17.5 10C17.5 14.1421 14.1421 17.5 10 17.5H3C2.79779 17.5 2.61549 17.3782 2.53809 17.1914C2.4607 17.0046 2.50349 16.7895 2.64648 16.6465L4.35547 14.9365C3.20124 13.6175 2.5 11.8906 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5ZM10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 11.7952 4.22659 13.4199 5.40332 14.5967L5.46582 14.6729C5.52017 14.7544 5.5498 14.8508 5.5498 14.9502C5.5498 15.0828 5.49709 15.2099 5.40332 15.3037L4.20703 16.5H10C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM13.29 9.30371C13.3986 9.05001 13.6925 8.93174 13.9463 9.04004C14.2 9.14863 14.3183 9.44253 14.21 9.69629C13.8506 10.536 13.1645 11.25 12.25 11.25C11.6372 11.25 11.128 10.9289 10.75 10.4648C10.372 10.9289 9.86276 11.25 9.25 11.25C8.63724 11.25 8.12801 10.9289 7.75 10.4648C7.37198 10.9289 6.86276 11.25 6.25 11.25C5.97386 11.25 5.75 11.0261 5.75 10.75C5.75 10.4739 5.97386 10.25 6.25 10.25C6.58764 10.25 7.00448 9.97056 7.29004 9.30371L7.32422 9.2373C7.41431 9.09121 7.5749 9 7.75 9C7.9501 9 8.13123 9.11975 8.20996 9.30371L8.32227 9.53516C8.59804 10.0359 8.95442 10.25 9.25 10.25C9.58764 10.25 10.0045 9.97056 10.29 9.30371L10.3242 9.2373C10.4143 9.09121 10.5749 9 10.75 9C10.9501 9 11.1312 9.11975 11.21 9.30371L11.3223 9.53516C11.598 10.0359 11.9544 10.25 12.25 10.25C12.5876 10.25 13.0045 9.97056 13.29 9.30371Z"></path>
+        </svg>
+        <span id="claude-static-chat-tooltip" style="position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); padding: 6px 12px; background: #30302E; color: #FAF9F5; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, &#39;Helvetica Neue&#39;, Arial, sans-serif;">Open chat</span>
+      </button>
+      <button id="claude-static-close-button" style="position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 6px; background: transparent; border: none; cursor: pointer; pointer-events: auto; vertical-align: middle; width: 32px; height: 32px; margin-left: 4px; border-radius: 8px; transition: background 0.2s;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; display: block;">
+          <path d="M15.1464 4.14642C15.3417 3.95121 15.6582 3.95118 15.8534 4.14642C16.0486 4.34168 16.0486 4.65822 15.8534 4.85346L10.7069 9.99997L15.8534 15.1465C16.0486 15.3417 16.0486 15.6583 15.8534 15.8535C15.6826 16.0244 15.4186 16.0461 15.2245 15.918L15.1464 15.8535L9.99989 10.707L4.85338 15.8535C4.65813 16.0486 4.34155 16.0486 4.14634 15.8535C3.95115 15.6583 3.95129 15.3418 4.14634 15.1465L9.29286 9.99997L4.14634 4.85346C3.95129 4.65818 3.95115 4.34162 4.14634 4.14642C4.34154 3.95128 4.65812 3.95138 4.85338 4.14642L9.99989 9.29294L15.1464 4.14642Z" fill="#141413"></path>
+        </svg>
+        <span id="claude-static-close-tooltip" style="position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); padding: 6px 12px; background: #30302E; color: #FAF9F5; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, &#39;Helvetica Neue&#39;, Arial, sans-serif;">Dismiss</span>
+      </button>
+    </div></body></html>
